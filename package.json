@@ -1,0 +1,38 @@
+{
+  "name": "trip-guide",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "도름스 체험학습: 체험학습 일정·안내를 한 페이지로 만들고 나누는 앱",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run guard && tsc -b && vite build",
+    "guard": "node scripts/check-no-usa-data.mjs && node scripts/check-no-emoji.mjs",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.8.1",
+    "maplibre-gl": "^6.10.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^22.10.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "playwright": "^1.63.0",
+    "sharp": "^0.35.4",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4"
+  }
+}

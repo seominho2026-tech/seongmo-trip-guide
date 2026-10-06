@@ -1,0 +1,17 @@
+도름스 체험학습에 쓴 글꼴과 프로그램
+
+글꼴 (SIL Open Font License 1.1)
+- Space Grotesk · Copyright 2020 The Space Grotesk Project Authors
+- JetBrains Mono · Copyright 2020 The JetBrains Mono Project Authors
+- Wanted Sans · Copyright 2023 Wanted Lab., Inc.
+  OFL 1.1 전문: https://openfontlicense.org
+
+지도와 길
+- 지도 타일: OpenFreeMap (https://openfreemap.org), © OpenMapTiles © OpenStreetMap contributors
+- 주소 찾기: Nominatim, © OpenStreetMap contributors (ODbL)
+- 길 계산: OSRM (project-osrm.org, routing.openstreetmap.de), © OpenStreetMap contributors (ODbL)
+
+프로그램
+- React, React DOM (MIT) · MapLibre GL JS (BSD-3-Clause) · Zod (MIT) · node-qrcode (MIT)
+- SheetJS Community Edition xlsx 0.20.3 (Apache-2.0)
+- Vercel Blob SDK (Apache-2.0)

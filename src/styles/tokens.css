@@ -1,0 +1,95 @@
+/*
+ * 디자인 토큰 · 크로마(도름슬라이드 경기도교육청 연수 덱)를 휴대폰 안내 앱으로 옮긴 것.
+ * 따뜻한 종이 바탕, 검은 잉크, 오렌지 한 가지 강조, 굵은 기하 산세리프 제목, 숫자는 모노.
+ * 글자 색 대비는 종이 바탕 기준 4.5:1 이상으로 맞췄다(muted 5.1, accent-ink 5.1).
+ */
+:root {
+  color-scheme: light;
+
+  /* 종이와 잉크 */
+  /* 그레인(곱하기)이 약 3% 어둡게 덮으므로 바탕을 그만큼 밝게 둔다. 화면에 보이는 값은 #f4f1eb */
+  --paper: #fbf8f2;
+  --paper-2: #ece7dc;
+  --sheet: #ffffff;
+  --ink: #111111;
+  --ink-2: #3b3833;
+  --muted: #6b655e;
+  --line: rgba(17, 17, 17, 0.14);
+  --line-2: rgba(17, 17, 17, 0.26);
+  --line-strong: #111111;
+
+  /* 강조: 지금·현재 구간·집결에만 쓴다 */
+  --accent: #ed5a14;
+  --accent-ink: #b53f0a;
+  --accent-soft: rgba(237, 90, 20, 0.12);
+
+  /* 어두운 패널 */
+  --dark: #151412;
+  --dark-2: #24221f;
+  --on-dark: #f4f1eb;
+  --on-dark-muted: #a8a198;
+
+  /* 크로마 보조색 (반 구분·일정 종류) */
+  --blue: #1e5fce;
+  --green: #235c34;
+  --purple: #7a42b8;
+  --ochre: #8a5a00;
+  --yellow: #d99d21;
+  --pink: #c9477f;
+  --sky: #5692f0;
+
+  /* 반 색: 1반 파랑 · 2반 초록 · 3반 보라 · 4반 황토 · 5반 분홍 */
+  --class-1: #1e5fce;
+  --class-2: #235c34;
+  --class-3: #7a42b8;
+  --class-4: #8a5a00;
+  --class-5: #c9477f;
+
+  /* 글꼴 */
+  --font-display: 'Chroma Grotesk', 'Wanted Sans', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  --font-ui: 'Wanted Sans', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  --font-mono: 'Chroma Mono', ui-monospace, 'SF Mono', Menlo, 'Wanted Sans', monospace;
+
+  /* 글자 크기 (휴대폰 기준 고정 rem) */
+  --fs-2xs: 0.6875rem; /* 11 */
+  --fs-xs: 0.75rem; /* 12 */
+  --fs-sm: 0.875rem; /* 14 */
+  --fs-base: 1rem; /* 16 */
+  --fs-lg: 1.125rem; /* 18 */
+  --fs-xl: 1.375rem; /* 22 */
+  --fs-2xl: 1.75rem; /* 28 */
+  --fs-3xl: 2.5rem; /* 40 */
+
+  /* 간격 (4px 단위) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(17, 17, 17, 0.06), 0 4px 12px rgba(17, 17, 17, 0.06);
+  --shadow-2: 0 2px 6px rgba(17, 17, 17, 0.08), 0 12px 32px rgba(17, 17, 17, 0.12);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-fast: 160ms;
+  --t-med: 220ms;
+
+  --topbar-h: 52px;
+  --bottombar-h: 74px;
+  --strip-h: 44px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* 필름 그레인 (크로마 무대와 같은 질감, 아주 옅게) */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
