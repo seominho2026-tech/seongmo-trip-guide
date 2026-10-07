@@ -652,7 +652,8 @@ select.input {
   width: min(370px, calc((var(--phone-h) - 20px) * 390 / 844 + 20px));
   margin: 0 auto;
   padding: 10px;
-  border-radius: 50px;
+  /* 화면 모서리(실제 휴대폰 약 47pt)를 줄인 배율만큼 따라 줄인다. 틀은 그보다 테두리만큼 크다 */
+  border-radius: calc(47px * var(--phone-s, 0.85) + 10px);
   background: #050505;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08),
@@ -663,7 +664,7 @@ select.input {
   position: relative;
   aspect-ratio: 390 / 844;
   overflow: hidden;
-  border-radius: 40px;
+  border-radius: calc(47px * var(--phone-s, 0.85));
   background: var(--paper);
 }
 

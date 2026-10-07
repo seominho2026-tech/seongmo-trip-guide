@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Icon } from '../../components/Icon'
 import { navigate } from '../../lib/router'
 import { readStored } from '../../lib/storage'
@@ -168,14 +168,18 @@ function PhonePreview() {
   useEffect(() => {
     const el = viewRef.current
     if (!el) return
-    const fit = () => el.clientWidth && setScale(el.clientWidth / PHONE_W)
+    // 소수 폭 그대로(반올림한 clientWidth 를 쓰면 1px 안팎 어긋난다)
+    const fit = () => {
+      const w = el.getBoundingClientRect().width
+      if (w) setScale(w / PHONE_W)
+    }
     fit()
     const ro = new ResizeObserver(fit)
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
   return (
-    <div className="phone">
+    <div className="phone" style={{ '--phone-s': scale } as CSSProperties}>
       <div className="phone__view" ref={viewRef}>
         <iframe
           className="phone__screen"
