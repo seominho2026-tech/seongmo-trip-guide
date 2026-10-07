@@ -125,7 +125,8 @@ export function TripMap({ d, page, onSelect }: { d: Derived; page: Page; onSelec
       return
     }
     map.touchZoomRotate.disableRotation()
-    map.addControl(new AttributionControl({ compact: true }), 'bottom-right')
+    // 대중교통 길 출처(Transitous)는 늘 밝힌다(편집 중에 대중교통 길을 넣어도 빠지지 않게)
+    map.addControl(new AttributionControl({ compact: true, customAttribution: '<a href="https://transitous.org/sources/" target="_blank" rel="noreferrer noopener">대중교통 길 Transitous</a>' }), 'bottom-right')
     map.once('style.load', () => {
       paintPaper(map)
       map.addSource('legs', { type: 'geojson', data: empty })

@@ -3,11 +3,11 @@ import { Icon, KIND_ICON } from '../../components/Icon'
 import { ApiFail, checkToken, fetchTrip, getToken, rememberTrip, saveTrip, setToken, type Loaded } from '../../lib/api'
 import { navigate } from '../../lib/router'
 import { readStored, writeStored } from '../../lib/storage'
-import { fillRoutes, pendingRoutes } from '../../lib/routing'
+import { fillRoutes, fitRoutes, pendingRoutes } from '../../lib/routing'
 import { findPii, PII_LABEL } from '../../lib/pii'
 import { addDays, clock, dateLabel, zoneName } from '../../lib/time'
 import { derive, stopKey } from '../../trip/derive'
-import { newId, resizeDays, TripDoc, type Stop, type TripDoc as TripDocT } from '../../trip/schema'
+import { newId, resizeDays, TripDoc, type Stop, type TripDoc as TripDocT, DOC_MAX_BYTES } from '../../trip/schema'
 import { orderStops } from '../../trip/order'
 import { TripMap } from '../map/TripMap'
 import { Dialog } from '../../components/Dialog'
@@ -142,7 +142,10 @@ export default function Editor({ id }: { id: string }) {
     try {
       const total = pendingRoutes(parsed.data)
       setSaving(total ? `길 계산 0/${total}` : '저장 중')
-      const { doc, failed } = await fillRoutes(parsed.data, (done, all) => all && setSaving(`길 계산 ${done}/${all}`))
+      const filled = await fillRoutes(parsed.data, (done, all) => all && setSaving(`길 계산 ${done}/${all}`))
+      // 길이 많아 서버 상한을 넘으면 길을 거칠게 줄이고, 그래도 넘치면 긴 길부터 직선으로 둔다
+      const { doc, straightened } = fitRoutes(filled.doc, DOC_MAX_BYTES)
+      const failed = filled.failed + straightened
       setSaving('저장 중')
       const r = await saveTrip(id, token, doc, overrideEtag ?? baseEtag)
       const fresh: Loaded = { doc, etag: r.etag, updatedAt: r.updatedAt }
@@ -215,6 +218,13 @@ export default function Editor({ id }: { id: string }) {
     const page = d.pageByKey.get(stopKey(s.id))
     const from = page?.type === 'stop' ? (page.from?.stop.place?.coords as LngLat | undefined) : undefined
     return from ?? anyPlace ?? null
+  }
+
+  // 오는 길의 출발점(앞 장소)과 그곳을 떠나는 시각(대중교통 시간표용)
+  const fromFor = (s: Stop): { from: LngLat | null; departAt: Date | null } => {
+    const page = d.pageByKey.get(stopKey(s.id))
+    const prev = page?.type === 'stop' ? page.from : null
+    return { from: (prev?.stop.place?.coords as LngLat | undefined) ?? null, departAt: prev ? (prev.end ?? prev.start) : null }
   }
 
   const setStop = (di: number, s: Stop) => update((doc) => ({ ...doc, days: doc.days.map((dd, i) => (i === di ? { ...dd, stops: dd.stops.map((x) => (x.id === s.id ? s : x)) } : dd)) }))
@@ -369,6 +379,7 @@ export default function Editor({ id }: { id: string }) {
                             dayCount={draft.days.length}
                             when={draft}
                             near={nearFor(s)}
+                            {...fromFor(s)}
                             first={firstPlaced}
                             onChange={(ns) => setStop(dayIdx, ns)}
                             onDelete={() => removeStop(dayIdx, s.id)}

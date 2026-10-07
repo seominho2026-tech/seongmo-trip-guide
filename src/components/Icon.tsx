@@ -271,6 +271,14 @@ const PATHS = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  minus: <path d="M5 12h14" />,
+  // 정류장 표지(가로 10 · 세로 17, 가운데 12,12)
+  transit: (
+    <>
+      <rect x="7" y="3.5" width="10" height="7.5" rx="1.75" />
+      <path d="M9.75 7.25h4.5M12 11v9.5M9.25 20.5h5.5" />
+    </>
+  ),
   chevronUp: <path d="m5.5 15.25 6.5-6.5 6.5 6.5" />,
   qr: (
     <>
@@ -392,4 +400,4 @@ export const KIND_ICON: Record<string, IconName> = {
   etc: 'info',
 }
 
-export const LEG_ICON: Record<string, IconName> = { bus: 'bus', walk: 'walk', subway: 'subway', train: 'train', car: 'car', flight: 'plane', boat: 'boat' }
+export const LEG_ICON: Record<string, IconName> = { bus: 'bus', walk: 'walk', transit: 'transit', subway: 'subway', train: 'train', car: 'car', flight: 'plane', boat: 'boat' }

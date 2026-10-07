@@ -37,7 +37,7 @@ src/
   trip/schema.ts     여행 문서 구조(zod, 화면·서버 공용)
   trip/derive.ts     문서 → 장 흐름(출발 전 → 일차 → 다녀와서)
   features/viewer    학생·보호자·선생님이 보는 화면
-  features/editor    편집기(장소 찾기 Nominatim, 길 계산 OSRM)
+  features/editor    편집기(장소 찾기 Nominatim, 길 계산 OSRM·Transitous)
   features/collect   느낀 점 모으기 → 살핌 양식 엑셀
   lib/reflectionFile.ts  학생 파일 형식(읽는 글 + 맨 끝 데이터 한 줄)
 public/sample/       랜딩 샘플(가상 학교의 경주 2박 3일, scripts/make-sample.mjs)
@@ -61,7 +61,9 @@ npm run build    # 검사(가드) + 타입 검사 + 빌드
 3. 환경 변수 `PIN_PEPPER`(무작위 32자 이상)와 `CRON_SECRET`(무작위)을 넣는다.
 4. 배포한다. 함수 리전은 `vercel.json`의 `icn1`(서울)이다.
 
-지도 타일은 OpenFreeMap, 주소 찾기는 Nominatim, 길 계산은 OSRM 공개 서버를 쓴다. 공개 서버 규칙(초당 1회, 자동완성 금지)을 지키도록 찾기 단추를 눌렀을 때만 부르고, 길은 선생님이 저장할 때 바뀐 구간만 한 번 계산한다.
+지도 타일은 OpenFreeMap, 주소 찾기는 Nominatim, 길 계산은 OSRM 공개 서버(버스·자동차·걷기)와 Transitous(대중교통·지하철·기차, 공개 시간표)를 쓴다. 공개 서버 규칙(초당 1회, 자동완성 금지)을 지키도록 찾기 단추를 눌렀을 때만 부르고, 길은 선생님이 편집기에서 수단과 장소를 정했을 때와 저장할 때 바뀐 구간만 한 번 계산한다. 계산한 시간은 선생님이 5분씩 늘리고 줄이거나 직접 적어 바꿀 수 있고, 직접 적은 시간이 학생 화면에 나간다.
+
+Transitous는 오픈소스·비상업 앱에 열린 공동체 서비스다. 직접 띄워 쓰는 곳도 사용 규칙(https://transitous.org/api/)을 지키고, 화면에 출처(https://transitous.org/sources/)를 밝혀야 한다. 바깥 주소를 새로 부르면 `vercel.json`의 CSP `connect-src`에도 넣어야 배포본에서 막히지 않는다(`npm run guard`가 확인한다).
 
 ## 라이선스
 

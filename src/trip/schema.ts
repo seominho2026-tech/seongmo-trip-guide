@@ -22,14 +22,15 @@ export const Place = z.object({
   coords: Coords,
 })
 
-export const LEG_MODES = ['bus', 'walk', 'subway', 'train', 'car', 'flight', 'boat'] as const
+export const LEG_MODES = ['bus', 'walk', 'transit', 'subway', 'train', 'car', 'flight', 'boat'] as const
 export const LegMode = z.enum(LEG_MODES)
 
 export const Route = z.object({
   /** 실제 길(단순화한 선). 비행기·배는 비워 둔다(화면이 호·직선으로 그린다). */
   coords: z.array(Coords).max(4000),
-  km: z.number().min(0),
-  min: z.number().min(0),
+  // 상한은 거절하지 않고 잘라서 받는다(상한이 생기기 전에 저장한 30시간 넘는 길도 열리게)
+  km: z.number().min(0).transform((v) => Math.min(v, 20_000)),
+  min: z.number().min(0).transform((v) => Math.min(v, 60 * 30)),
   /** 이 길을 계산한 두 지점(장소를 옮기면 다시 계산하려고) */
   from: Coords,
   to: Coords,

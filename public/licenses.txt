@@ -10,6 +10,7 @@
 - 지도 타일: OpenFreeMap (https://openfreemap.org), © OpenMapTiles © OpenStreetMap contributors
 - 주소 찾기: Nominatim, © OpenStreetMap contributors (ODbL)
 - 길 계산: OSRM (project-osrm.org, routing.openstreetmap.de), © OpenStreetMap contributors (ODbL)
+- 대중교통 길: Transitous (https://transitous.org), 시간표 출처는 https://transitous.org/sources/ , © OpenStreetMap contributors (ODbL)
 
 프로그램
 - React, React DOM (MIT) · MapLibre GL JS (BSD-3-Clause) · Zod (MIT) · node-qrcode (MIT)

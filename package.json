@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run guard && tsc -b && vite build",
-    "guard": "node scripts/check-no-usa-data.mjs && node scripts/check-no-emoji.mjs",
+    "guard": "node scripts/check-no-usa-data.mjs && node scripts/check-no-emoji.mjs && node scripts/check-csp.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "test": "tsx --test tests/*.test.ts"

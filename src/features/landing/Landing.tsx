@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { createPortal } from 'react-dom'
 import { Icon } from '../../components/Icon'
 import { navigate } from '../../lib/router'
+import { useModal } from '../../components/Dialog'
 import { readStored } from '../../lib/storage'
 import type { MyTrip } from '../../lib/api'
 import { dateLabel } from '../../lib/time'
@@ -9,6 +11,7 @@ const LINKTREE = 'https://dorms.school/links'
 
 /** 첫 화면: 무엇을 하는 앱인지, 샘플(실제로 움직이는 안내), 시작하기, 개인정보 약속 */
 export function Landing() {
+  const [big, setBig] = useState(false)
   const mine = readStored<MyTrip[]>('my-trips', [])
   const [open, setOpen] = useState('')
   const [openErr, setOpenErr] = useState<string | null>(null)
@@ -53,9 +56,15 @@ export function Landing() {
           </div>
           <div className="land-hero__demo" aria-label="샘플 안내 화면">
             <PhonePreview />
-            <p className="land-hero__caption">실제로 넘겨 보세요. 경주 2박 3일 샘플이에요.</p>
+            <p className="land-hero__caption">
+              <span>실제로 넘겨 보세요. 경주 2박 3일 샘플이에요.</span>
+              <button type="button" className="btn btn--on-dark btn--sm" onClick={() => setBig(true)}>
+                <Icon name="expand" size="0.95rem" /> 크게 보기
+              </button>
+            </p>
           </div>
         </section>
+        {big ? <PhoneModal onClose={() => setBig(false)} /> : null}
 
         <section className="land-steps" aria-labelledby="steps-title">
           <h2 className="land-h2" id="steps-title">
@@ -93,6 +102,7 @@ export function Landing() {
           <ul className="bullets">
             <li>안내는 링크를 아는 누구나 볼 수 있어요. 학생·교사 이름, 휴대전화 번호, 건강 정보, 방·좌석 배정은 적지 마세요. 휴대전화 번호·주민등록번호·이메일 주소가 들어가면 저장되지 않아요.</li>
             <li>학번·이름·느낀 점은 학생 휴대폰에만 저장되고 서버로 가지 않아요. 학생이 낸 파일로만 선생님께 전해져요.</li>
+            <li>길과 걸리는 시간을 계산할 때는 장소 위치와 출발 시각만 길 찾기 서버(OSRM, Transitous)로 보내요. 여행 이름이나 학생 정보는 보내지 않아요.</li>
             <li>PIN은 숫자 그대로 저장하지 않고, 여러 번 틀리면 잠깐 잠겨요.</li>
             <li>여행은 끝난 날로부터 1년이 지나면 자동으로 지워져요.</li>
           </ul>
@@ -148,10 +158,10 @@ export function Landing() {
 
       <footer className="land-foot">
         <a className="btn btn--ghost land-foot__tree" href={LINKTREE} target="_blank" rel="noreferrer noopener">
-          <Icon name="link" size="1.05rem" /> 도름스 링크트리
+          <Icon name="link" size="1.05rem" /> Team DoRm 링크트리
         </a>
         <p className="land-foot__small">
-          Team DoRm · 지도 © OpenStreetMap contributors, OpenFreeMap · 길 계산 OSRM · <a href="/licenses.txt">사용한 글꼴과 프로그램</a>
+          Team DoRm · 지도 © OpenStreetMap contributors, OpenFreeMap · 길 계산 OSRM · 대중교통 길 <a href="https://transitous.org/sources/" target="_blank" rel="noreferrer noopener">Transitous</a> · <a href="/licenses.txt">사용한 글꼴과 프로그램</a>
         </p>
       </footer>
     </div>
@@ -162,8 +172,37 @@ export function Landing() {
 const PHONE_W = 390
 const PHONE_H = 844
 
-function PhonePreview() {
+/** 휴대폰 틀 하나. big 이면 창에 크게 띄우는 모양(키보드로도 안을 조작할 수 있게) */
+function PhonePreview({ big = false, onEscape }: { big?: boolean; onEscape?: () => void }) {
   const viewRef = useRef<HTMLDivElement>(null)
+  const frameRef = useRef<HTMLIFrameElement>(null)
+  const escRef = useRef(onEscape)
+  escRef.current = onEscape
+  // 휴대폰 화면 안을 누른 뒤에는 키가 안쪽 문서로 간다. 안쪽에서 일정표 같은 창을 닫는 데 쓰지 않은 Esc 만 바깥 창 닫기로 넘긴다.
+  useEffect(() => {
+    const frame = frameRef.current
+    if (!frame || !onEscape) return
+    let win: Window | null = null
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !e.defaultPrevented) escRef.current?.()
+    }
+    const attach = () => {
+      win?.removeEventListener('keydown', onKey)
+      try {
+        win = frame.contentWindow
+        win?.addEventListener('keydown', onKey)
+      } catch {
+        win = null
+      }
+    }
+    attach()
+    frame.addEventListener('load', attach)
+    return () => {
+      frame.removeEventListener('load', attach)
+      win?.removeEventListener('keydown', onKey)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [scale, setScale] = useState(0.85)
   useEffect(() => {
     const el = viewRef.current
@@ -179,17 +218,47 @@ function PhonePreview() {
     return () => ro.disconnect()
   }, [])
   return (
-    <div className="phone" style={{ '--phone-s': scale } as CSSProperties}>
+    <div className={big ? 'phone phone--big' : 'phone'} style={{ '--phone-s': scale } as CSSProperties}>
       <div className="phone__view" ref={viewRef}>
         <iframe
+          ref={frameRef}
           className="phone__screen"
           src="/sample?embed=1"
           title="경주 2박 3일 샘플 안내"
-          loading="lazy"
-          tabIndex={-1}
+          loading={big ? 'eager' : 'lazy'}
+          tabIndex={big ? 0 : -1}
           style={{ width: PHONE_W, height: PHONE_H, transform: `scale(${scale})` }}
         />
       </div>
     </div>
+  )
+}
+
+/** 크게 보기: 화면 위에 휴대폰을 크게 띄워 직접 눌러 보게 한다. Esc·닫기·바깥 누르기로 닫힌다. */
+function PhoneModal({ onClose }: { onClose: () => void }) {
+  const panelRef = useRef<HTMLDivElement>(null)
+  // 휴대폰 화면(iframe) 끝에서 Tab 을 더 누르면 바깥 문서로 초점이 나간다. 창이 열린 동안 뒤 화면을 통째로 막는다.
+  // useModal 보다 먼저 두어, 닫을 때 막기를 먼저 풀고 나서 연 단추로 초점을 돌려준다.
+  const openerRef = useRef<HTMLElement | null>(null)
+  useEffect(() => {
+    // 막기 전에 연 단추를 기억한다(막힌 요소는 초점을 잃는다)
+    openerRef.current = document.activeElement as HTMLElement | null
+    const back = document.querySelector<HTMLElement>('.land')
+    back?.setAttribute('inert', '')
+    return () => back?.removeAttribute('inert')
+  }, [])
+  useModal(panelRef, onClose, '.phone-modal__close', () => openerRef.current)
+  return createPortal(
+    <div className="phone-modal" onClick={onClose}>
+      <div ref={panelRef} className="phone-modal__panel" role="dialog" aria-modal="true" aria-label="샘플 안내 크게 보기" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="icon-btn phone-modal__close" onClick={onClose} aria-label="닫기">
+          <Icon name="close" />
+        </button>
+        <PhonePreview big onEscape={onClose} />
+        {/* 휴대폰 안 마지막 단추에서 Tab 을 누르면 브라우저 바깥으로 나가지 않고 닫기로 돌아온다 */}
+        <span tabIndex={0} onFocus={() => panelRef.current?.querySelector<HTMLElement>('.phone-modal__close')?.focus()} />
+      </div>
+    </div>,
+    document.body,
   )
 }

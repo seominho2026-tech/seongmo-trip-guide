@@ -1,4 +1,4 @@
-import { LEG_LABEL, legMinutes, type DayPage, type StopPage } from '../../trip/derive'
+import { LEG_LABEL, legMinutes, type DayPage, type StopPage, TRANSIT } from '../../trip/derive'
 import { rich } from '../../components/Rich'
 import { Icon, KIND_ICON, LEG_ICON } from '../../components/Icon'
 import { goTo } from '../../lib/router'
@@ -16,6 +16,7 @@ export function DayCover({ page }: { page: DayPage }) {
   const sum = (modes: string[]) => stops.reduce((n, p) => n + (p.stop.leg && modes.includes(p.stop.leg.mode) ? (legMinutes(p) ?? 0) : 0), 0)
   const busMin = sum(['bus', 'car'])
   const walkMin = sum(['walk'])
+  const transitMin = sum(TRANSIT)
   const places = new Set(stops.flatMap((p) => (p.stop.place ? [p.stop.place.name] : []))).size
   const lodging = [...stops].reverse().find((p) => p.stop.kind === 'lodging' && p.stop.place)
   const [, m, dd] = (page.chapter.date ?? '0000-00-00').split('-').map(Number)
@@ -42,6 +43,12 @@ export function DayCover({ page }: { page: DayPage }) {
           <div>
             <dt>차로 이동</dt>
             <dd className="mono">{duration(busMin)}</dd>
+          </div>
+        ) : null}
+        {transitMin ? (
+          <div>
+            <dt>대중교통</dt>
+            <dd className="mono">{duration(transitMin)}</dd>
           </div>
         ) : null}
         {walkMin ? (

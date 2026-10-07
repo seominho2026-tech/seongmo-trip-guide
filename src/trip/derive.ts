@@ -170,8 +170,10 @@ export function routeFits(route: Route | undefined, a: LngLat, b: LngLat): boole
   return near(route.from, a) && near(route.to, b)
 }
 
-/** 길을 계산할 수 있는 이동 수단(비행기·배는 계산하지 않는다) */
-export const ROUTABLE: LegMode[] = ['bus', 'car', 'walk']
+/** 시간표로 계산하는 이동 수단(대중교통 길 찾기) */
+export const TRANSIT: LegMode[] = ['transit', 'subway', 'train']
+/** 길과 걸리는 시간을 자동으로 계산하는 이동 수단(비행기·배는 직접 적는다) */
+export const ROUTABLE: LegMode[] = ['bus', 'car', 'walk', ...TRANSIT]
 
 /** 이 일정에서 오는 길의 걸리는 시간(분): 적은 값이 우선, 없으면 계산한 길 */
 export function legMinutes(p: StopPage): number | null {
@@ -196,6 +198,7 @@ export const KIND_LABEL: Record<Stop['kind'], string> = {
 export const LEG_LABEL: Record<LegMode, string> = {
   bus: '버스',
   walk: '걸어서',
+  transit: '대중교통',
   subway: '지하철',
   train: '기차',
   car: '자동차',
