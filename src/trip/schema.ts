@@ -38,7 +38,7 @@ export const Route = z.object({
 
 export const Leg = z.object({
   mode: LegMode,
-  /** 걸리는 시간(분). 비우면 계산한 길의 시간을 쓴다. */
+  /** 걸리는 시간(분). 선생님이 직접 적는다(비우면 학생 화면에 시간을 내지 않는다). */
   minutes: z.number().int().min(1).max(60 * 30).optional(),
   /** 한 줄 설명. 예: 버스로 이동, 2호차는 정문에 내려요 */
   note: text(120).optional(),

@@ -258,12 +258,6 @@ const PATHS = {
     </>
   ),
   arrowRight: <path d="M4.5 12h14.5M13.5 6.5 19 12l-5.5 5.5" />,
-  refresh: (
-    <>
-      <path d="M19.5 7.5A8 8 0 1 0 20 13" />
-      <path d="M20 3.5v4.5h-4.5" />
-    </>
-  ),
   download: (
     <>
       <path d="M12 4v11M7.5 10.5 12 15l4.5-4.5" />

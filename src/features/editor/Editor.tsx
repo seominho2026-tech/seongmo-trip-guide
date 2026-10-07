@@ -220,13 +220,6 @@ export default function Editor({ id }: { id: string }) {
     return from ?? anyPlace ?? null
   }
 
-  // 오는 길의 출발점(앞 장소)과 그곳을 떠나는 시각(대중교통 시간표용)
-  const fromFor = (s: Stop): { from: LngLat | null; departAt: Date | null } => {
-    const page = d.pageByKey.get(stopKey(s.id))
-    const prev = page?.type === 'stop' ? page.from : null
-    return { from: (prev?.stop.place?.coords as LngLat | undefined) ?? null, departAt: prev ? (prev.end ?? prev.start) : null }
-  }
-
   const setStop = (di: number, s: Stop) => update((doc) => ({ ...doc, days: doc.days.map((dd, i) => (i === di ? { ...dd, stops: dd.stops.map((x) => (x.id === s.id ? s : x)) } : dd)) }))
   const addStop = (di: number) => {
     const stops = orderStops(draft, di, draft.days[di].stops)
@@ -379,7 +372,6 @@ export default function Editor({ id }: { id: string }) {
                             dayCount={draft.days.length}
                             when={draft}
                             near={nearFor(s)}
-                            {...fromFor(s)}
                             first={firstPlaced}
                             onChange={(ns) => setStop(dayIdx, ns)}
                             onDelete={() => removeStop(dayIdx, s.id)}

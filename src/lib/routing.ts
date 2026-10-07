@@ -118,13 +118,11 @@ function km(a: LngLat, b: LngLat) {
   return 2 * R * Math.asin(Math.sqrt(h))
 }
 
-/** 한 번 부르기: 응답 JSON, 길 없음(null), 서버 응답 없음('down'), 부르기 전에 그만둠('aborted') */
-async function getJson(url: string, signal?: AbortSignal): Promise<unknown | null | 'down' | 'aborted'> {
+/** 한 번 부르기: 응답 JSON, 길 없음(null), 서버 응답 없음('down') */
+async function getJson(url: string): Promise<unknown | null | 'down'> {
   // 공용 서버가 응답을 붙잡고 있어도 저장이 멈추지 않게, 한 번에 8초까지만 기다리고 두 번 해 본다(안 되면 직선)
   for (let attempt = 0; attempt < 2; attempt++) {
-    if (signal?.aborted) return 'aborted'
     await slot()
-    if (signal?.aborted) return 'aborted'
     try {
       const res = await fetch(url, { referrerPolicy: 'strict-origin', signal: AbortSignal.timeout(8_000) })
       if (res.ok) return await res.json()
@@ -140,18 +138,18 @@ async function getJson(url: string, signal?: AbortSignal): Promise<unknown | nul
   return 'down'
 }
 
-type Got = Route | null | 'down' | 'aborted'
+type Got = Route | null | 'down'
 
 /** 고른 수단만 타는 길(지하철은 지하철만, 기차는 열차만, 대중교통은 무엇이든). Transitous 의 RAIL 은 지하철까지 넣어서 열차 종류를 하나씩 적는다. */
 const TRANSIT_MODES: Partial<Record<LegMode, string>> = { subway: 'SUBWAY', train: 'HIGHSPEED_RAIL,LONG_DISTANCE,NIGHT_RAIL,REGIONAL_FAST_RAIL,REGIONAL_RAIL' }
 
 /** 그 시각의 대중교통 길 가운데 가장 빨리 가는 것(시간표가 없으면 null). 남의 서버 응답이라 모양과 범위를 다 확인한다. */
 
-async function transitAt(mode: LegMode, a: LngLat, b: LngLat, at: Date, signal?: AbortSignal): Promise<Got> {
+async function transitAt(mode: LegMode, a: LngLat, b: LngLat, at: Date): Promise<Got> {
   const q = new URLSearchParams({ fromPlace: `${q5(a[1])},${q5(a[0])}`, toPlace: `${q5(b[1])},${q5(b[0])}`, time: at.toISOString(), numItineraries: '3' })
   if (TRANSIT_MODES[mode]) q.set('transitModes', TRANSIT_MODES[mode]!)
-  const j = await getJson(`https://api.transitous.org/api/v5/plan?${q}`, signal)
-  if (j === null || j === 'down' || j === 'aborted') return j
+  const j = await getJson(`https://api.transitous.org/api/v5/plan?${q}`)
+  if (j === null || j === 'down') return j
   try {
     const raw = (j as { itineraries?: unknown }).itineraries
     const its = (Array.isArray(raw) ? raw : []).filter(
@@ -190,18 +188,18 @@ export function transitTimes(depart: Date | null, now = Date.now()): Date[] {
   return Math.abs(near.getTime() - at.getTime()) < 3_600_000 ? [at] : [at, near]
 }
 
-async function compute(mode: LegMode, a: LngLat, b: LngLat, depart: Date | null, signal?: AbortSignal): Promise<Got> {
+async function compute(mode: LegMode, a: LngLat, b: LngLat, depart: Date | null): Promise<Got> {
   if (TRANSIT.includes(mode)) {
     let last: Got = null
     for (const at of transitTimes(depart)) {
-      last = await transitAt(mode, a, b, at, signal)
+      last = await transitAt(mode, a, b, at)
       if (last !== null) return last
     }
     return last
   }
   const base = mode === 'walk' ? 'https://routing.openstreetmap.de/routed-foot/route/v1/driving' : 'https://router.project-osrm.org/route/v1/driving'
-  const j = await getJson(`${base}/${q5(a[0])},${q5(a[1])};${q5(b[0])},${q5(b[1])}?overview=full&geometries=geojson`, signal)
-  if (j === null || j === 'down' || j === 'aborted') return j
+  const j = await getJson(`${base}/${q5(a[0])},${q5(a[1])};${q5(b[0])},${q5(b[1])}?overview=full&geometries=geojson`)
+  if (j === null || j === 'down') return j
   try {
     const r = (j as { routes?: { distance?: unknown; duration?: unknown; geometry?: { coordinates?: unknown } }[] }).routes?.[0]
     const line = r?.geometry?.coordinates
@@ -214,7 +212,7 @@ async function compute(mode: LegMode, a: LngLat, b: LngLat, depart: Date | null,
   }
 }
 
-/** 이 세션에서 이미 물어본 구간(편집기 미리 계산과 저장이 같은 구간을 두 번 묻지 않게). 오래된 것부터 300개까지 */
+/** 이 세션에서 이미 물어본 구간(여러 번 저장해도 같은 구간을 두 번 묻지 않게). 오래된 것부터 300개까지 */
 const memo = new Map<string, Promise<Got>>()
 const MEMO_MAX = 300
 
@@ -224,32 +222,22 @@ async function checked(p: Promise<Got>): Promise<Got> {
   return r && typeof r === 'object' && !RouteSchema.safeParse(r).success ? null : r
 }
 
-/**
- * 길(없으면 null). 'down': 서버가 응답하지 않음(남은 구간은 기다리지 않고 직선으로).
- * signal 이 끊기면 아직 보내지 않은 요청은 보내지 않는다(닫은 일정의 계산).
- */
-export async function fetchRoute(mode: LegMode, a: LngLat, b: LngLat, depart: Date | null = null, signal?: AbortSignal): Promise<Route | null | 'down'> {
+/** 길(없으면 null). 'down': 서버가 응답하지 않음(남은 구간은 기다리지 않고 직선으로). 같은 구간은 한 번만 묻는다. */
+export async function fetchRoute(mode: LegMode, a: LngLat, b: LngLat, depart: Date | null = null): Promise<Route | null | 'down'> {
   const hour = TRANSIT.includes(mode) && depart ? Math.floor(depart.getTime() / 3_600_000) : 0
   const key = `${mode}|${a.join(',')}|${b.join(',')}|${hour}`
-  for (let i = 0; i < 2; i++) {
-    let p = memo.get(key)
-    const mine = !p
-    if (!p) {
-      p = checked(compute(mode, a, b, depart, signal))
-      memo.set(key, p)
-      if (memo.size > MEMO_MAX) memo.delete(memo.keys().next().value!)
-      // 서버가 안 받았거나 그만둔 것, 예외로 끝난 것은 기억하지 않는다(다음에 다시 묻는다)
-      p.then(
-        (r) => (r === 'down' || r === 'aborted') && memo.delete(key),
-        () => memo.delete(key),
-      )
-    }
-    const r = await p
-    if (r !== 'aborted') return r
-    // 남이 시작했다가 그만둔 요청이면 내 것으로 한 번 더 묻는다
-    if (mine || signal?.aborted) return 'down'
+  let p = memo.get(key)
+  if (!p) {
+    p = checked(compute(mode, a, b, depart))
+    memo.set(key, p)
+    if (memo.size > MEMO_MAX) memo.delete(memo.keys().next().value!)
+    // 서버가 안 받은 것과 예외로 끝난 것은 기억하지 않는다(다음에 다시 묻는다)
+    p.then(
+      (r) => r === 'down' && memo.delete(key),
+      () => memo.delete(key),
+    )
   }
-  return 'down'
+  return p
 }
 
 /** 시험에서 기억을 비운다 */

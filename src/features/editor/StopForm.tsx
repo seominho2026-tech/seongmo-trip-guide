@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Icon, KIND_ICON, LEG_ICON } from '../../components/Icon'
-import { DEFAULT_PROMPT, KIND_LABEL, LEG_LABEL, ROUTABLE, TRANSIT, routeFits } from '../../trip/derive'
-import { fetchRoute, same } from '../../lib/routing'
+import { DEFAULT_PROMPT, KIND_LABEL, LEG_LABEL } from '../../trip/derive'
 import { LEG_MODES, STOP_KINDS, type LegMode, type Stop, type TripDoc } from '../../trip/schema'
 import { stopInstant } from '../../trip/order'
 import { addDays, clock, dateLabel, zoneName } from '../../lib/time'
@@ -15,8 +14,6 @@ export function StopForm({
   dayCount,
   when,
   near,
-  from,
-  departAt,
   first,
   onChange,
   onDelete,
@@ -28,9 +25,6 @@ export function StopForm({
   /** 출발일·여행지·출발지 시간대(날짜 고르기와 시각 미리 보기에 쓴다) */
   when: Pick<TripDoc, 'startDate' | 'tz' | 'homeTz'>
   near: LngLat | null
-  /** 바로 앞 장소(오는 길의 출발점)와 그곳을 떠나는 시각(대중교통 시간표용) */
-  from: LngLat | null
-  departAt: Date | null
   first: boolean
   onChange: (s: Stop) => void
   onDelete: () => void
@@ -50,10 +44,10 @@ export function StopForm({
       return
     }
     if (stop.leg?.mode === mode) return
-    // 수단을 바꾸면 옛 길과 그 길로 맞춰 둔 시간은 버리고 새로 계산한다(비행기·배는 적어 둔 시간을 그대로 둔다)
-    const { route: _route, minutes, ...keep } = stop.leg ?? {}
+    // 수단을 바꾸면 옛 길은 버린다(저장할 때 새 수단으로 다시 그린다). 적어 둔 시간은 그대로 둔다.
+    const { route: _route, ...keep } = stop.leg ?? {}
     void _route
-    set({ leg: { ...keep, mode, ...(!ROUTABLE.includes(mode) && minutes ? { minutes } : {}) } })
+    set({ leg: { ...keep, mode } })
   }
   return (
     <div className="stopf" data-noswipe>
@@ -136,7 +130,7 @@ export function StopForm({
         </div>
         {stop.leg ? (
           <div className="field-row">
-            <LegTime stop={stop} from={from} departAt={departAt} onChange={onChange} />
+            <LegTime stop={stop} onChange={onChange} />
             <label className="field">
               <span className="field__hint">한 줄 설명</span>
               <input className="input" maxLength={120} placeholder="예: 정문 앞에 내려요" value={stop.leg.note ?? ''} onChange={(e) => set({ leg: { ...stop.leg!, note: e.target.value || undefined } })} />
@@ -224,99 +218,26 @@ function fmtAt(at: Date, tz: string) {
 
 const clampMin = (n: number) => Math.max(1, Math.min(1800, Math.round(n)))
 
-/**
- * 걸리는 시간: 걷기·차·대중교통은 앞 장소에서 오는 길을 바로 계산해 보여 주고,
- * 선생님이 5분씩 늘리고 줄이거나 직접 적을 수 있다(직접 적은 시간이 학생 화면에 나간다).
- */
-function LegTime({ stop, from, departAt, onChange }: { stop: Stop; from: LngLat | null; departAt: Date | null; onChange: (s: Stop) => void }) {
+/** 걸리는 시간: 선생님이 직접 적는다(5분씩 늘리고 줄이는 단추도). 지도 길은 저장할 때 따로 그린다. */
+function LegTime({ stop, onChange }: { stop: Stop; onChange: (s: Stop) => void }) {
   const leg = stop.leg!
-  const here = (stop.place?.coords as LngLat | undefined) ?? null
-  const routable = ROUTABLE.includes(leg.mode)
-  const fits = !!(from && here && routeFits(leg.route, from, here))
-  const auto = fits ? Math.max(1, Math.round(leg.route!.min)) : null
-  const custom = leg.minutes ?? null
-  const shown = custom ?? auto
-  const [calc, setCalc] = useState<'idle' | 'busy' | 'fail'>('idle')
-  const latest = useRef(stop)
-  latest.current = stop
-  const changeRef = useRef(onChange)
-  changeRef.current = onChange
-  const sameSpot = !!(from && here && same(from, here))
-
-  // 수단·장소가 정해졌는데 맞는 길이 없으면 잠깐 기다렸다 한 번 계산한다(칩을 여러 번 눌러도 마지막 것만)
-  useEffect(() => {
-    if (!routable || !from || !here || sameSpot || fits) {
-      setCalc('idle')
-      return
-    }
-    let alive = true
-    const ctrl = new AbortController()
-    setCalc('busy')
-    const mode = leg.mode
-    const t = window.setTimeout(async () => {
-      let r: Awaited<ReturnType<typeof fetchRoute>> = null
-      try {
-        r = await fetchRoute(mode, from, here, departAt, ctrl.signal)
-      } catch {
-        r = null
-      }
-      if (!alive) return
-      const cur = latest.current
-      const curHere = cur.place?.coords as LngLat | undefined
-      if (cur.leg?.mode !== mode || !curHere || curHere[0] !== here[0] || curHere[1] !== here[1]) return
-      if (r && r !== 'down') {
-        changeRef.current({ ...cur, leg: { ...cur.leg, route: r } })
-        setCalc('idle')
-      } else setCalc('fail')
-    }, 700)
-    return () => {
-      alive = false
-      ctrl.abort()
-      window.clearTimeout(t)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leg.mode, routable, fits, sameSpot, from?.[0], from?.[1], here?.[0], here?.[1]])
-
-  // 자동값과 같아지면 직접 고친 것이 아니라 자동으로 둔다(장소를 옮기면 다시 계산되게)
-  const setMinutes = (m: number | undefined) => onChange({ ...stop, leg: { ...leg, minutes: m !== undefined && m === auto ? undefined : m } })
-  const step = (d: number) => setMinutes(clampMin((shown ?? 0) + d))
-  // 칸에 적는 동안의 글자(지웠다 새로 쓰는 중에 자동값이 끼어들지 않게, 칸을 떠날 때 확정한다)
+  const value = leg.minutes ?? null
+  const setMinutes = (m: number | undefined) => onChange({ ...stop, leg: { ...leg, minutes: m } })
+  // 칸에 적는 동안의 글자(지웠다 새로 쓰는 중에 값이 끼어들지 않게, 칸을 떠날 때 확정한다)
   const [text, setText] = useState<string | null>(null)
   const commit = () => {
     if (text === null) return
     const n = Number(text)
-    setMinutes(text.trim() && Number.isFinite(n) ? clampMin(n) : undefined)
+    setMinutes(text.trim() && Number.isFinite(n) && n > 0 ? clampMin(n) : undefined)
     setText(null)
   }
-  const done = TRANSIT.includes(leg.mode)
-    ? '대중교통 시간표로 계산했어요. 정류장에서 처음 기다리는 시간은 빠져 있어요.'
-    : leg.mode === 'walk'
-      ? '걷는 길로 계산했어요. 여럿이 함께 걸으면 더 걸리니 넉넉히 늘려 두세요.'
-      : '찻길로 계산했어요. 막히는 길과 타고 내리는 시간은 빠져 있으니 넉넉히 늘려 두세요.'
-  const note = !routable
-    ? `${LEG_LABEL[leg.mode]}는 자동으로 계산하지 않아요. 직접 적어 주세요.`
-    : !stop.place
-      ? '장소를 넣으면 앞 장소에서 오는 시간을 자동으로 계산해요.'
-      : !from
-        ? '앞에 장소가 있는 일정이 없어 계산할 길이 없어요.'
-        : sameSpot
-          ? '앞 장소와 같은 곳이에요.'
-          : calc === 'busy'
-            ? '길을 찾고 있어요.'
-            : calc === 'fail' && !fits
-              ? '자동으로 찾지 못했어요. 직접 적어 주세요.'
-              : custom && auto
-                ? `자동 계산은 ${auto}분이에요. 학생 화면에는 고친 ${custom}분이 보여요.`
-                : auto
-                  ? done
-                  : ''
   return (
     <div className="field legtime">
       <span className="field__hint" id={`legtime-${stop.id}`}>
         걸리는 시간(분)
       </span>
       <div className="legtime__row">
-        <button type="button" className="icon-btn legtime__step" onClick={() => step(-5)} disabled={!shown || shown <= 1} aria-label="5분 줄이기">
+        <button type="button" className="icon-btn legtime__step" onClick={() => setMinutes(value && value > 5 ? value - 5 : undefined)} disabled={!value} aria-label="5분 줄이기">
           <Icon name="minus" size="1rem" />
         </button>
         <input
@@ -326,26 +247,17 @@ function LegTime({ stop, from, departAt, onChange }: { stop: Stop; from: LngLat 
           max={1800}
           inputMode="numeric"
           aria-labelledby={`legtime-${stop.id}`}
-          placeholder={calc === 'busy' ? '계산 중' : '분'}
-          value={text ?? shown ?? ''}
+          placeholder="분"
+          value={text ?? value ?? ''}
           onChange={(e) => setText(e.target.value)}
           onBlur={commit}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), commit())}
         />
-        <button type="button" className="icon-btn legtime__step" onClick={() => step(5)} aria-label="5분 늘리기">
+        <button type="button" className="icon-btn legtime__step" onClick={() => setMinutes(clampMin((value ?? 0) + 5))} aria-label="5분 늘리기">
           <Icon name="plus" size="1rem" />
         </button>
-        {custom && auto && custom !== auto ? (
-          <button type="button" className="btn btn--ghost btn--sm legtime__reset" onClick={() => setMinutes(undefined)}>
-            <Icon name="refresh" size="0.95rem" /> 자동 {auto}분
-          </button>
-        ) : null}
       </div>
-      {note ? (
-        <p className="field__hint legtime__note" role="status">
-          {note}
-        </p>
-      ) : null}
+      <p className="field__hint legtime__note">{value ? `학생 화면에 ${value}분으로 보여요.` : '직접 적어 주세요. 비워 두면 학생 화면에 시간이 나오지 않아요.'}</p>
     </div>
   )
 }

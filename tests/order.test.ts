@@ -257,3 +257,11 @@ test('routing: an OSRM answer that the schema would refuse is not used', async (
     globalThis.fetch = orig
   }
 })
+
+test('travel time shown to students is only what the teacher typed', async () => {
+  const { legMinutes } = await import('../src/trip/derive.js')
+  const route = { coords: [[127, 36], [127.01, 36]] as [number, number][], km: 1, min: 7, from: [127, 36] as [number, number], to: [127.01, 36] as [number, number] }
+  const page = (leg: unknown) => ({ stop: { leg, place: { name: 'b', coords: [127.01, 36] } }, from: { stop: { place: { name: 'a', coords: [127, 36] } } } }) as unknown as Parameters<typeof legMinutes>[0]
+  assert.equal(legMinutes(page({ mode: 'bus', route })), null, 'a calculated route alone gives no time')
+  assert.equal(legMinutes(page({ mode: 'bus', route, minutes: 25 })), 25)
+})

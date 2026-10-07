@@ -172,16 +172,12 @@ export function routeFits(route: Route | undefined, a: LngLat, b: LngLat): boole
 
 /** 시간표로 계산하는 이동 수단(대중교통 길 찾기) */
 export const TRANSIT: LegMode[] = ['transit', 'subway', 'train']
-/** 길과 걸리는 시간을 자동으로 계산하는 이동 수단(비행기·배는 직접 적는다) */
+/** 지도에 실제 길을 그리는 이동 수단(비행기·배는 호·직선으로 그린다) */
 export const ROUTABLE: LegMode[] = ['bus', 'car', 'walk', ...TRANSIT]
 
-/** 이 일정에서 오는 길의 걸리는 시간(분): 적은 값이 우선, 없으면 계산한 길 */
+/** 이 일정에서 오는 길의 걸리는 시간(분): 선생님이 적은 값만 쓴다(계산한 길은 지도에 선만 그린다) */
 export function legMinutes(p: StopPage): number | null {
-  const leg = p.stop.leg
-  if (!leg) return null
-  if (leg.minutes) return leg.minutes
-  if (leg.route && p.from?.stop.place && p.stop.place && routeFits(leg.route, p.from.stop.place.coords as LngLat, p.stop.place.coords as LngLat)) return Math.round(leg.route.min)
-  return null
+  return p.stop.leg?.minutes ?? null
 }
 
 /** 학생이 느낀 점을 쓰는 일정 */
