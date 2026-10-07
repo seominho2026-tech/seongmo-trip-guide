@@ -647,27 +647,39 @@ select.input {
 }
 
 .phone {
-  width: 360px;
-  height: 720px;
-  max-height: 78vh;
+  /* 실제 휴대폰 화면 비율(390×844)을 지키면서 창 높이에 맞춘다. 테두리(10px×2)는 비율 밖 */
+  --phone-h: min(860px, calc(100vh - 160px));
+  width: min(370px, calc((var(--phone-h) - 20px) * 390 / 844 + 20px));
   margin: 0 auto;
-  border: 10px solid #000;
-  border-radius: 44px;
-  overflow: hidden;
-  background: var(--paper);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+  padding: 10px;
+  border-radius: 50px;
+  background: #050505;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 30px 60px rgba(0, 0, 0, 0.45);
 }
 
+.phone__view {
+  position: relative;
+  aspect-ratio: 390 / 844;
+  overflow: hidden;
+  border-radius: 40px;
+  background: var(--paper);
+}
+
+/* 안쪽은 진짜 휴대폰 크기로 그리고 통째로 줄인다(JS 가 scale 을 정한다) */
 .phone__screen {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: block;
-  width: 100%;
-  height: 100%;
   border: 0;
+  transform-origin: 0 0;
 }
 
 @media (min-width: 960px) {
   .land-hero {
-    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-columns: minmax(0, 1fr) 370px;
     align-items: center;
     gap: var(--s-10);
     padding: var(--s-10) var(--s-10) var(--s-8);

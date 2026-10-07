@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../../components/Icon'
 import { navigate } from '../../lib/router'
 import { readStored } from '../../lib/storage'
@@ -52,9 +52,7 @@ export function Landing() {
             <p className="land-hero__note">로그인 없이 써요. 선생님은 여행을 만들 때 정한 PIN으로 고쳐요.</p>
           </div>
           <div className="land-hero__demo" aria-label="샘플 안내 화면">
-            <div className="phone">
-              <iframe className="phone__screen" src="/sample?embed=1" title="경주 2박 3일 샘플 안내" loading="lazy" tabIndex={-1} />
-            </div>
+            <PhonePreview />
             <p className="land-hero__caption">실제로 넘겨 보세요. 경주 2박 3일 샘플이에요.</p>
           </div>
         </section>
@@ -156,6 +154,38 @@ export function Landing() {
           Team DoRm · 지도 © OpenStreetMap contributors, OpenFreeMap · 길 계산 OSRM · <a href="/licenses.txt">사용한 글꼴과 프로그램</a>
         </p>
       </footer>
+    </div>
+  )
+}
+
+/** 실제 휴대폰 화면 크기(390×844)로 샘플을 그린 뒤 틀에 맞게 통째로 줄인다. 안의 앱은 진짜 휴대폰에서처럼 배치된다. */
+const PHONE_W = 390
+const PHONE_H = 844
+
+function PhonePreview() {
+  const viewRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(0.85)
+  useEffect(() => {
+    const el = viewRef.current
+    if (!el) return
+    const fit = () => el.clientWidth && setScale(el.clientWidth / PHONE_W)
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div className="phone">
+      <div className="phone__view" ref={viewRef}>
+        <iframe
+          className="phone__screen"
+          src="/sample?embed=1"
+          title="경주 2박 3일 샘플 안내"
+          loading="lazy"
+          tabIndex={-1}
+          style={{ width: PHONE_W, height: PHONE_H, transform: `scale(${scale})` }}
+        />
+      </div>
     </div>
   )
 }
