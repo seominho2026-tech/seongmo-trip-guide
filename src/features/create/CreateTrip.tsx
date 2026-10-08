@@ -16,7 +16,7 @@ export default function CreateTrip({ fromSample }: { fromSample: boolean }) {
   const today = clock(new Date(), 'Asia/Seoul').ymd
   const [sample, setSample] = useState<TripDoc | null>(null)
   const [title, setTitle] = useState('')
-  const [school, setSchool] = useState('')
+  const [school, setSchool] = useState('대전성모여자고등학교')
   const [startDate, setStartDate] = useState(addDays(today, 14))
   const [nights, setNights] = useState(2)
   const [abroad, setAbroad] = useState(false)
@@ -89,7 +89,7 @@ export default function CreateTrip({ fromSample }: { fromSample: boolean }) {
             <span className="field__label">
               학교·학년 <span className="field__opt">넣지 않아도 돼요</span>
             </span>
-            <input className="input" maxLength={40} placeholder="예: 도름고등학교 2학년" value={school} onChange={(e) => setSchool(e.target.value)} />
+            <input className="input" maxLength={40} placeholder="예: 대전성모여자고등학교 2학년" value={school} onChange={(e) => setSchool(e.target.value)} />
           </label>
           <div className="field-row">
             <label className="field">
@@ -196,7 +196,7 @@ function RecoveryScreen({ id, code, title }: { id: string; code: string; title: 
               type="button"
               className="btn btn--ghost"
               onClick={async () => {
-                setCopied(await copyText(`도름스 체험학습 「${title}」 복구 코드: ${code}`))
+                setCopied(await copyText(`대전성모여고 체험학습 가이드 「${title}」 복구 코드: ${code}`))
               }}
             >
               <Icon name="copy" size="1.05rem" /> {copied ? '복사했어요' : '복사'}

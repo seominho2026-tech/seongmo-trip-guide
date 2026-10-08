@@ -140,7 +140,7 @@ export async function handleManifest(req: Request, ctxOverride?: Ctx): Promise<R
   const raw = url.search.replace(/^\?/, '')
   // 정해진 모양(id 하나)만, 열쇠 없이. 그 밖에는 저장소를 읽지 않고 기본 앱 정보를 준다
   const id = /^id=[a-z2-9]{10}$/.test(raw) && !req.headers.has('authorization') ? raw.slice(3) : ''
-  let name = '도름스 체험학습'
+  let name = '대전성모여고 체험학습 가이드'
   let known = false
   try {
     const ctx = ctxOverride ?? serverCtx()

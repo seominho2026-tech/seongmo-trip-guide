@@ -55,7 +55,7 @@ export function buildFileData(d: Derived, tripId: string, me: Me, book: Book, sa
 
 export function buildReflectionText(d: Derived, data: FileData): string {
   const lines: string[] = []
-  lines.push('도름스 체험학습 · 느낀 점')
+  lines.push('대전성모여고 체험학습 가이드 · 느낀 점')
   lines.push(`여행: ${d.doc.title} (${longDate(d.doc.startDate)}부터 ${d.doc.nights}박 ${d.doc.nights + 1}일)`)
   lines.push(`학번: ${data.no}`)
   lines.push(`이름: ${data.name}`)
@@ -101,7 +101,7 @@ export function parseReflectionFile(text: string): ParseResult {
 }
 
 function parseBody(text: string): ParseResult {
-  if (!text.startsWith('도름스 체험학습 · 느낀 점')) return { ok: false, reason: '도름스 체험학습 느낀 점 파일이 아니에요.' }
+  if (!['대전성모여고 체험학습 가이드 · 느낀 점', '도름스 체험학습 · 느낀 점'].some((header) => text.startsWith(header))) return { ok: false, reason: '체험학습 가이드 느낀 점 파일이 아니에요.' }
   const head = (label: string) => text.match(new RegExp(`^${label}: (.+)$`, 'm'))?.[1]?.trim() ?? ''
   const no = head('학번')
   const name = head('이름')

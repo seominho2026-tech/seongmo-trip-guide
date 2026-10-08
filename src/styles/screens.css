@@ -581,9 +581,11 @@ select.input {
   font-weight: 700;
   letter-spacing: -0.02em;
   text-decoration: none;
+  word-break: keep-all;
 }
 
 .land-top__link {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -612,6 +614,13 @@ select.input {
   letter-spacing: -0.035em;
   line-height: 1.08;
   text-wrap: balance;
+}
+
+.land-hero__school {
+  margin-bottom: var(--s-3);
+  color: #f3b896;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .land-hero__lead {

@@ -13,7 +13,7 @@ export function ShareSheet({ id, doc, onClose }: { id: string; doc: TripDoc; onC
   const url = tripUrl(id)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [copied, setCopied] = useState<string | null>(null)
-  const msg = `[${doc.title}] 체험학습 안내예요. 일정·모이는 곳·준비물을 여기서 확인해요. 홈 화면에 추가해 두면 앱처럼 열려요.\n${url}`
+  const msg = `[대전성모여고 체험학습 가이드 · ${doc.title}] 체험학습 안내예요. 일정·모이는 곳·준비물을 여기서 확인해요. 홈 화면에 추가해 두면 앱처럼 열려요.\n${url}`
 
   useEffect(() => {
     if (canvasRef.current) void QRCode.toCanvas(canvasRef.current, url, { width: 220, margin: 1, color: { dark: '#111111', light: '#ffffff' }, errorCorrectionLevel: 'M' })

@@ -241,7 +241,7 @@ function MyReflections() {
             </p>
           ) : null}
           <p className="fineprint">
-            파일 이름은 학번_이름_느낀점.txt예요. 휴대폰 메모처럼 열어 읽을 수 있어요. 아이폰은 오랫동안 이 안내를 열지 않으면 저장한 글이 지워질 수 있으니, 다녀오면 바로 저장해서 내 주세요.
+            자동 제출되지 않아요. 내려받은 파일을 선생님이 지정한 제출 경로에 올려 주세요. 브라우저 데이터를 지우기 전에 파일로 저장해 주세요. 파일 이름은 학번_이름_느낀점.txt예요. 휴대폰 메모처럼 열어 읽을 수 있어요. 아이폰은 오랫동안 이 안내를 열지 않으면 저장한 글이 지워질 수 있으니, 다녀오면 바로 저장해서 내 주세요.
           </p>
           <button type="button" className="link-btn" onClick={() => fileRef.current?.click()}>
             <Icon name="upload" size="1rem" /> 다른 휴대폰에서 저장한 파일 불러오기

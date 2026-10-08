@@ -29,7 +29,7 @@ export function Landing() {
           <span className="land-top__mark" aria-hidden="true">
             <Icon name="pin" size="1.05rem" strokeWidth={2.2} />
           </span>
-          도름스 체험학습
+          대전성모여고 체험학습 가이드
         </a>
         <a className="land-top__link" href={LINKTREE} target="_blank" rel="noreferrer noopener">
           Team DoRm
@@ -40,6 +40,7 @@ export function Landing() {
       <main>
         <section className="land-hero">
           <div className="land-hero__copy">
+            <p className="land-hero__school">대전성모여자고등학교</p>
             <h1 className="land-hero__title">체험학습 안내를 한 페이지로</h1>
             <p className="land-hero__lead">
               장소 주소와 시각만 넣으면 지도 동선과 시간표가 만들어져요. 링크와 QR로 나눠 줘요. 여행 중에 고쳐도 같은 링크에 15초 안에 반영돼요. 학생이 장소마다 쓴 느낀 점은 살핌 생기부 양식 엑셀로 모아요.
@@ -57,7 +58,7 @@ export function Landing() {
           <div className="land-hero__demo" aria-label="샘플 안내 화면">
             <PhonePreview />
             <p className="land-hero__caption">
-              <span>실제로 넘겨 보세요. 경주 2박 3일 샘플이에요.</span>
+              <span>실제로 넘겨 보세요. 경주 2박 3일 가상 예시이며 실제 학교 일정이 아니에요.</span>
               <button type="button" className="btn btn--on-dark btn--sm" onClick={() => setBig(true)}>
                 <Icon name="expand" size="0.95rem" /> 크게 보기
               </button>
@@ -89,7 +90,7 @@ export function Landing() {
               <span className="steps-flow__n mono">3</span>
               <div>
                 <h3>모으기</h3>
-                <p>학생은 장소마다 느낀 점을 써요. 다녀와서 「내 느낀 점 저장」으로 파일 하나를 받아 클래스룸 등에 내요. 선생님은 그 파일들을 한꺼번에 끌어다 놓아 살핌에 바로 올릴 엑셀 하나로 받아요.</p>
+                <p>학생은 장소마다 느낀 점을 써요. 다녀와서 「내 느낀 점 저장」으로 파일 하나를 받아 선생님이 지정한 제출 경로에 내요. 자동으로 제출되지는 않아요. 선생님은 그 파일들을 한꺼번에 끌어다 놓아 살핌에 바로 올릴 엑셀 하나로 받아요.</p>
               </div>
             </li>
           </ol>
@@ -161,7 +162,7 @@ export function Landing() {
           <Icon name="link" size="1.05rem" /> Team DoRm 링크트리
         </a>
         <p className="land-foot__small">
-          Team DoRm · 지도 © OpenStreetMap contributors, OpenFreeMap · 길 계산 OSRM · 대중교통 길 <a href="https://transitous.org/sources/" target="_blank" rel="noreferrer noopener">Transitous</a> · <a href="/licenses.txt">사용한 글꼴과 프로그램</a>
+          원작: Team DoRm · 지도 © OpenStreetMap contributors, OpenFreeMap · 길 계산 OSRM · 대중교통 길 <a href="https://transitous.org/sources/" target="_blank" rel="noreferrer noopener">Transitous</a> · <a href="/licenses.txt">사용한 글꼴과 프로그램</a>
         </p>
       </footer>
     </div>

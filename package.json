@@ -1,9 +1,9 @@
 {
-  "name": "trip-guide",
+  "name": "seongmo-trip-guide",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "도름스 체험학습: 체험학습 일정·안내를 한 페이지로 만들고 나누는 앱",
+  "description": "대전성모여자고등학교 체험학습 일정·안내 및 학생 소감 파일 수합 앱",
   "license": "MIT",
   "scripts": {
     "dev": "vite",

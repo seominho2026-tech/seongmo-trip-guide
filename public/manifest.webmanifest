@@ -1,6 +1,6 @@
 {
-  "name": "도름스 체험학습",
-  "short_name": "체험학습",
+  "name": "대전성모여고 체험학습 가이드",
+  "short_name": "성모 체험학습",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f4f1eb",

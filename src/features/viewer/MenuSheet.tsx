@@ -70,7 +70,7 @@ export function MenuSheet({ onJump, onClose }: { onJump: (key: string) => void; 
         ) : null}
         <p className="fineprint menu__fine">이 안내는 링크만 있으면 누구나 볼 수 있어요. 느낀 점·학번·이름·체크한 것은 이 휴대폰에만 저장되고 서버로 보내지 않아요.</p>
         <button type="button" className="link-btn" onClick={() => navigate('/')}>
-          <Icon name="home" size="1rem" /> 도름스 체험학습 첫 화면
+          <Icon name="home" size="1rem" /> 대전성모여고 체험학습 가이드 첫 화면
         </button>
       </div>
     </Sheet>

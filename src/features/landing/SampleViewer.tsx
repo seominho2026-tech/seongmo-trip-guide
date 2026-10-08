@@ -20,7 +20,7 @@ export function SampleViewer() {
         banner={
           embed ? null : (
             <div className="sample-banner" role="note">
-              <span className="sample-banner__text">샘플이에요. 학교와 시각은 지어낸 것이고, 장소는 실제 경주예요.</span>
+              <span className="sample-banner__text">가상 예시예요. 실제 대전성모여자고등학교 일정이 아니며, 장소는 실제 경주예요.</span>
               <span className="sample-banner__acts">
                 <button type="button" className="btn btn--primary btn--sm" onClick={() => navigate('/new?from=sample')}>
                   이 샘플로 시작하기

@@ -39,6 +39,9 @@ test('body-only fallback when the data line is deleted', () => {
   assert.deepEqual(r.data.items.map((i) => [i.d, i.t, i.a]), [[1, '불국사', '탑을 봤다'], [2, '양동마을', '마을을 걸었다\n두 줄']])
   const c = collect(d, 'trip123456', [{ name: 'a.txt', text: cut }])
   assert.equal(c.students[0].answers.get('aaaaaa3'), '마을을 걸었다\n두 줄')
+  const legacy = parseReflectionFile(cut.replace('대전성모여고 체험학습 가이드 · 느낀 점', '도름스 체험학습 · 느낀 점'))
+  assert.ok(legacy.ok && legacy.fromText)
+  if (legacy.ok) assert.deepEqual(legacy.data, r.data)
 })
 
 test('garbage files are rejected', () => {
