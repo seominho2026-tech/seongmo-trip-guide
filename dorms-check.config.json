@@ -1,0 +1,15 @@
+{
+  "app": {
+    "name": "대전성모여고 체험학습 가이드",
+    "url": "https://seongmo-trip-guide.vercel.app",
+    "stack": "Vite"
+  },
+  "tracks": [
+    "security"
+  ],
+  "edzipCase": null,
+  "teacher": {
+    "dormsHandle": ""
+  },
+  "ownershipConfirmed": true
+}

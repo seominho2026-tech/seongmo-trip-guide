@@ -7,6 +7,7 @@
 - Vercel orgId: team_jWOKc9uPTAoRFeZxYePdneO3
 - Vercel team: smh-s-projects
 - Vercel project: seongmo-trip-guide
+- 공개 주소: https://seongmo-trip-guide.vercel.app
 - Blob store: store_GhfSlwQNtbR4cbaD (private, icn1)
 - Supabase: 사용하지 않음
 

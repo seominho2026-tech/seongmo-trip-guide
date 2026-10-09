@@ -32,7 +32,7 @@ export function Landing() {
           대전성모여고 체험학습 가이드
         </a>
         <a className="land-top__link" href={LINKTREE} target="_blank" rel="noreferrer noopener">
-          Team DoRm
+          원작 소개
           <Icon name="external" size="0.9rem" />
         </a>
       </header>

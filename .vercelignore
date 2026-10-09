@@ -1,5 +1,6 @@
 .data
 .artifacts
+.dorms-check
 .claude
 *.log
 .env*

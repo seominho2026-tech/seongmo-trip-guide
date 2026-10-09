@@ -16,6 +16,9 @@
 ## 개발 및 배포
 
 - GitHub: https://github.com/seominho2026-tech/seongmo-trip-guide
+- 앱: https://seongmo-trip-guide.vercel.app
+- 가상 샘플: https://seongmo-trip-guide.vercel.app/sample
+- 검사 기록: [VERIFICATION.md](./VERIFICATION.md)
 - `main` 브랜치를 Vercel에 연결하여 변경 시 자동 배포합니다.
 - 안내 문서는 비공개 Vercel Blob에 저장합니다. 학생 소감은 서버에 저장하지 않습니다.
 - `.env*`, `.vercel/`, `.data/`, 검사 산출물에는 인증값이나 학생 자료가 있을 수 있으므로 Git에 넣지 않습니다.
