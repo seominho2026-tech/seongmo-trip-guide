@@ -7,8 +7,6 @@ import { readStored } from '../../lib/storage'
 import type { MyTrip } from '../../lib/api'
 import { dateLabel } from '../../lib/time'
 
-const LINKTREE = 'https://dorms.school/links'
-
 /** 첫 화면: 무엇을 하는 앱인지, 샘플(실제로 움직이는 안내), 시작하기, 개인정보 약속 */
 export function Landing() {
   const [big, setBig] = useState(false)
@@ -31,16 +29,11 @@ export function Landing() {
           </span>
           대전성모여고 체험학습 가이드
         </a>
-        <a className="land-top__link" href={LINKTREE} target="_blank" rel="noreferrer noopener">
-          원작 소개
-          <Icon name="external" size="0.9rem" />
-        </a>
       </header>
 
       <main>
         <section className="land-hero">
           <div className="land-hero__copy">
-            <p className="land-hero__school">대전성모여자고등학교</p>
             <h1 className="land-hero__title">체험학습 안내를 한 페이지로</h1>
             <p className="land-hero__lead">
               장소 주소와 시각만 넣으면 지도 동선과 시간표가 만들어져요. 링크와 QR로 나눠 줘요. 여행 중에 고쳐도 같은 링크에 15초 안에 반영돼요. 학생이 장소마다 쓴 느낀 점은 살핌 생기부 양식 엑셀로 모아요.
@@ -58,7 +51,6 @@ export function Landing() {
           <div className="land-hero__demo" aria-label="샘플 안내 화면">
             <PhonePreview />
             <p className="land-hero__caption">
-              <span>실제로 넘겨 보세요. 경주 2박 3일 가상 예시이며 실제 학교 일정이 아니에요.</span>
               <button type="button" className="btn btn--on-dark btn--sm" onClick={() => setBig(true)}>
                 <Icon name="expand" size="0.95rem" /> 크게 보기
               </button>
@@ -157,14 +149,6 @@ export function Landing() {
         </section>
       </main>
 
-      <footer className="land-foot">
-        <a className="btn btn--ghost land-foot__tree" href={LINKTREE} target="_blank" rel="noreferrer noopener">
-          <Icon name="link" size="1.05rem" /> Team DoRm 링크트리
-        </a>
-        <p className="land-foot__small">
-          원작: Team DoRm · 지도 © OpenStreetMap contributors, OpenFreeMap · 길 계산 OSRM · 대중교통 길 <a href="https://transitous.org/sources/" target="_blank" rel="noreferrer noopener">Transitous</a> · <a href="/licenses.txt">사용한 글꼴과 프로그램</a>
-        </p>
-      </footer>
     </div>
   )
 }
